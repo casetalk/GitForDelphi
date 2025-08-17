@@ -1,17 +1,52 @@
 GitForDelphi - Delphi bindings to [libgit2](https://github.com/libgit2/libgit2)
 =================================
 
-GitForDelphi allows you to work with git repositories from within your Delphi code, with the only dependencies being the uGitForDelphi.pas source file and the libgit2 DLL.
+The original work for GitForDelphi allows you to work with git repositories from within your Delphi code, with the only dependencies being the uGitForDelphi.pas source file and the libgit2 DLL.
 
-To use, just add `uGitForDelphi` to the uses section, and call `InitLibgit2;` and the libgit2 DLL will be loaded, and its API will be ready to use to read from, create and edit git repositories.
+It was announced wrapper classes are to be developed in the future for easier Delphi-like calling. This repository clone extends the original work with two more units. These units wrap the original work for the announcaed easier Delphi-like access.
 
 Current status
 --------------
 
-Currently, GitForDelphi is exposing the libgit2 C API exactly, all function exports from git2.dll have been converted, including necessary structures. Some of the tests from libgit2 have been converted and are all passing.
+I added the long awaited wrapper class, `TGitRepository` to give a nicer Delphi-like interface to working with repositories. Additionally `TGitOperations` will allow easier Delphi-like operations to be executed.
 
-I intend to make a wrapper class, `TGitRepository` to give a nicer Delphi-like interface to working with repositories.
+Unit tests have not been added just yet to this repository. You are welcome to help contribute.
 
+Usage example:
+
+    var
+      Repo: TGitRepository;
+      GitOps: TGitOperations;
+    begin
+      Repo := TGitRepository.Create;
+      try
+        if Repo.OpenRepository('C:\MyProject') then
+        begin
+          GitOps := TGitOperations.Create(Repo);
+          try
+            // Set user info
+            GitOps.SetUserInfo('John Doe', 'john@example.com');
+
+            // Stage all modified files
+            GitOps.StageAll;
+
+            // Create a commit
+            GitOps.CreateCommit('Initial commit');
+
+            // Create a new branch
+            GitOps.CreateBranch('feature-branch');
+
+            // Get repository info
+            ShowMessage(GitOps.GetRepositoryInfo);
+
+          finally
+            GitOps.Free;
+          end;
+        end;
+      finally
+        Repo.Free;
+      end;
+    end;
 
 
 ### pre-built libgit2 DLL:
@@ -27,4 +62,3 @@ License
 =======
 
 MIT. See LICENSE file.
-
